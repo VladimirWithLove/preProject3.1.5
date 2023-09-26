@@ -13,7 +13,6 @@ import java.util.Set;
 
 @Component
 public class SuccessUserHandler implements AuthenticationSuccessHandler {
-    // Spring Security использует объект Authentication, пользователя авторизованной сессии.
     private User currentUser;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException {

@@ -11,20 +11,20 @@ const userFetchService = {
         'Content-Type': 'application/json',
         'Referer': null
     },
-    findAllUsers: async () => await fetch('api/users'),
-    findOneUser: async (id) => await fetch(`api/users/${id}`),
-    addNewUser: async (user) => await fetch('api/users', {
+    findAllUsers: async () => await fetch('api/admin/users'),
+    findOneUser: async (id) => await fetch(`api/admin/users/${id}`),
+    addNewUser: async (user) => await fetch('api/admin/users', {
         method: 'POST',
         headers: userFetchService.head,
         body: JSON.stringify(user)
     }),
-    updateUser: async (user, id) => await fetch(`api/users/`, {
+    updateUser: async (user, id) => await fetch(`api/admin/users/`, {
         method: 'PUT',
         headers: userFetchService.head,
         body: JSON.stringify(user)
     }),
     deleteUser: async (id) =>
-        await fetch(`api/users/${id}`, {method: 'DELETE', headers: userFetchService.head})
+        await fetch(`api/admin/users/${id}`, {method: 'DELETE', headers: userFetchService.head})
 }
 
 async function getTableWithUsers() {
@@ -138,17 +138,6 @@ async function addNewUser() {
         const triggerEl = document.querySelector('#myTab button[data-bs-target="#home"]')
         bootstrap.Tab.getInstance(triggerEl).show()
     }
-
-    // else {
-    //     let body = await response.json();
-    //     let alert = `<div class="alert alert-danger alert-dismissible fade show col-12" role="alert" id="sharaBaraMessageError">
-    //                         ${body.info}
-    //                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    //                             <span aria-hidden="true">&times;</span>
-    //                         </button>
-    //                     </div>`;
-    //     tabProfile.prepend(alert)
-    // }
 }
 
 async function getDefaultModal() {

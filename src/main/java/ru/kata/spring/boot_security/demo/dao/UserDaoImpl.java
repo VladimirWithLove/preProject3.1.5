@@ -1,9 +1,7 @@
 package ru.kata.spring.boot_security.demo.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
-import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 
 import javax.persistence.*;
@@ -14,12 +12,6 @@ public class UserDaoImpl implements UserDao {
 
     @PersistenceContext
     private EntityManager entityManager;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    public UserDaoImpl(BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
 
     @Override
     public void add(User user) {
@@ -27,12 +19,6 @@ public class UserDaoImpl implements UserDao {
         if (userFromDB != null) {
             return;
         }
-        if (user.getProfession() != null && user.getProfession().contains("ROLE_ADMIN")) {
-            user.setRoles(new HashSet<>(List.of(new Role(1L, "ROLE_USER"), new Role(2L, "ROLE_ADMIN"))));
-        } else {
-            user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
-        }
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         entityManager.persist(user);
     }
 
@@ -55,7 +41,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void updateUser(long id, User user) {
+    public User updateUser(long id, User user) {
         Query query = entityManager.createQuery("update User set login= :newLogin, name= :newName, surname= :newSurname, " +
                 "age= :newAge where id= :userId");
         query.setParameter("newLogin", user.getLogin());
@@ -65,23 +51,7 @@ public class UserDaoImpl implements UserDao {
         query.setParameter("userId", id);
         query.executeUpdate();
 
-        if (!user.getPassword().isEmpty()) {
-            Query passwordQuery = entityManager.createQuery("update User set password= :newPassword where id= :userId");
-            passwordQuery.setParameter("newPassword", bCryptPasswordEncoder.encode(user.getPassword()));
-            passwordQuery.setParameter("userId", id);
-            passwordQuery.executeUpdate();
-        }
-
-        if (user.getProfession() != null) {
-            User editedUser = entityManager.find(User.class, id);
-            if (user.getProfession().contains("ROLE_ADMIN")) {
-                editedUser.setRoles(new HashSet<>(List.of(new Role(1L, "ROLE_USER"), new Role(2L, "ROLE_ADMIN"))));
-                editedUser.setProfession("ROLE_ADMIN");
-            } else {
-                editedUser.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
-                editedUser.setProfession("ROLE_USER");
-            }
-        }
+        return getUser(id);
     }
 
     @Override
