@@ -39,15 +39,10 @@
     }
 </style>
 
-<div class="container-fluid d-flex flex-column" th:object="${thisUser}">
+<div class="container-fluid d-flex flex-column">
     <div id="formHead" class="row p-1 align-items-center">
         <div class="col-10 text-white">
             <h5>
-                <strong>
-                    <r th:utext="${thisUser.getLogin()}"></r>
-                </strong>
-                with roles:
-                <r th:utext="${thisUser.getRolesString()}"></r>
             </h5>
         </div>
         <div class="col-2 text-end">

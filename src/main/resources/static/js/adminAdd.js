@@ -1,4 +1,5 @@
 $(async function () {
+    fulfillHead();
     await getTableWithUsers();
     getNewUserTab();
     getDefaultModal();
@@ -13,6 +14,7 @@ const userFetchService = {
     },
     findAllUsers: async () => await fetch('api/admin/users'),
     findOneUser: async (id) => await fetch(`api/admin/users/${id}`),
+    findCurrentUser: async () => await fetch('api/user/users/currentUser'),
     addNewUser: async (user) => await fetch('api/admin/users', {
         method: 'POST',
         headers: userFetchService.head,
@@ -25,6 +27,20 @@ const userFetchService = {
     }),
     deleteUser: async (id) =>
         await fetch(`api/admin/users/${id}`, {method: 'DELETE', headers: userFetchService.head})
+}
+
+async function fulfillHead() {
+    let h5 = $('#formHead h5');
+    h5.empty()
+
+    await userFetchService.findCurrentUser()
+        .then(user => user.json())
+        .then(user => {
+            let headFilling = `
+                <strong>${user.login}</strong> with roles: ${user.rolesString}
+            `;
+            h5.append(headFilling)
+        })
 }
 
 async function getTableWithUsers() {
@@ -143,13 +159,11 @@ async function addNewUser() {
 async function getDefaultModal() {
     $('#someDefaultModal').modal({
         keyboard: true,
-        // backdrop: "static",
         show: false
     }).on("show.bs.modal", (event) => {
         let thisModal = $(event.target);
         let userid = thisModal.attr('data-userid');
         let action = thisModal.attr('data-action');
-        // console.log(thisModal,userid)
         switch (action) {
             case 'edit':
                 editUser(thisModal, userid);
